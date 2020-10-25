@@ -1,0 +1,34 @@
+{
+  "name": "silver-diamond",
+  "version": "1.0.1",
+  "description": "JS wrapper for Silver Diamond Artificial Intelligence service",
+  "main": "index.js",
+  "dependencies": {
+    "node-fetch": "^2.0.0"
+  },
+  "engines": {
+    "node": "^10.17 || >=12.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "ai",
+    "artificial",
+    "intelligence",
+    "silver",
+    "diamond",
+    "silver",
+    "diamond",
+    "nlp",
+    "vision",
+    "api",
+    "ml"
+  ],
+  "author": "Raúl López",
+  "license": "MIT"
+}
