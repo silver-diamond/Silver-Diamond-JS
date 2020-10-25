@@ -208,6 +208,7 @@ class SilverDiamond {
                     if (!response.sentiment) {
                         return reject(new Error('Unknown error'))
                     }
+
                     resolve(response.sentiment)
                 })
                 .catch(error => reject(error))
@@ -357,7 +358,7 @@ class SilverDiamond {
         return new Promise((resolve, reject) => {
             this.client.request('text-rank-keywords', data)
                 .then(response => {
-                    if (!response.keywords || !Array.isArray(response.keywords)) {
+                    if (!response.hasOwnProperty('keywords') || !Array.isArray(response.keywords)) {
                         return reject(new Error('Unknown error'))
                     }
 
@@ -378,7 +379,7 @@ class SilverDiamond {
         return new Promise((resolve, reject) => {
             this.client.request('text-rank-summary', data)
                 .then(response => {
-                    if (!response.summary) {
+                    if (!response.hasOwnProperty('summary')) {
                         return reject(new Error('Unknown error'))
                     }
                     resolve(response.summary)
