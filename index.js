@@ -20,6 +20,16 @@ const Sentiment = {
     VeryNegative: 'Very negative'
 }
 
+const Readability = {
+    VeryEasy: 'Very Easy',
+    Easy: 'Easy',
+    FairlyEasy: 'Fairly Easy',
+    Standard: 'Standard',
+    FairlyDifficult: 'Fairly Difficult',
+    Difficult: 'Difficult',
+    VeryDifficult: 'Very Difficult'
+}
+
 class Client {
     constructor (apiKey) {
         this.apiKey = apiKey
@@ -88,7 +98,7 @@ class SilverDiamond {
     }
 
     /**
-     * Returns true if the discovered language is included in `$isoCodes`
+     * Returns true if the discovered language is included in `isoCodes`
      *
      * @param {string} text
      * @param {string|array} isoCodes
@@ -334,13 +344,16 @@ class SilverDiamond {
     similarity (text1, text2) {
         text1 = this._normalizeText(text1)
         text2 = this._normalizeText(text2)
-        const data = { texts: [text1, text2] }
+        const data = {
+            texts: [text1, text2]
+        }
         return new Promise((resolve, reject) => {
             this.client.request('short-text-similarity', data)
                 .then(response => {
                     if (!response.hasOwnProperty('similarity')) {
                         return reject(new Error('Unknown error'))
                     }
+
                     resolve(response.similarity)
                 })
                 .catch(error => reject(error))
@@ -382,6 +395,7 @@ class SilverDiamond {
                     if (!response.hasOwnProperty('summary')) {
                         return reject(new Error('Unknown error'))
                     }
+
                     resolve(response.summary)
                 })
                 .catch(error => reject(error))
@@ -396,14 +410,14 @@ class SilverDiamond {
      * @param {string} sourceLang
      */
     translate (text, targetLang, sourceLang) {
-        text = this._normalizeText(text);
+        text = this._normalizeText(text)
         const data = {
             text: text,
             target_lang: targetLang
         }
 
         if (sourceLang) {
-            data.source_lang = sourceLang;
+            data.source_lang = sourceLang
         }
 
         return new Promise((resolve, reject) => {
@@ -412,10 +426,99 @@ class SilverDiamond {
                     if (!response.translation) {
                         return reject(new Error('Unknown error'))
                     }
+
                     resolve(response.translation)
                 })
                 .catch(error => reject(error))
         })
+    }
+
+    /**
+     * Returns the readability and readability scores of the provided `text` written in `lang`
+     * @param {string} text 
+     * @param {string} lang 
+     */
+    readability (text, lang = 'en') {
+        text = this._normalizeText(text)
+        const data = {
+            text: text,
+            lang: lang
+        }
+
+        return new Promise((resolve, reject) => {
+            this.client.request('text-readability', data)
+                .then(response => {
+                    if (!response.hasOwnProperty('score') || !response.hasOwnProperty('readability')) {
+                        return reject(new Error('Unknown error'))
+                    }
+
+                    resolve(response)
+                })
+                .catch(reject)
+        })
+    }
+
+    /**
+     * Returns a `Readability` value for the provided `text` written in `lang`
+     *
+     * @param {string} text
+     * @param {string} lang
+     */
+    readabilityCategory (text, lang = 'en') {
+        return this.readability(text, lang)
+            .then(readability => readability.readability)
+    }
+
+    /**
+     * Returns the readability score for the provided `text` written in `lang`
+     *
+     * @param {string} text
+     * @param {string} lang
+     */
+    readabilityScore (text, lang = 'en') {
+        return this.readability(text, lang)
+            .then(readability => readability.score)
+    }
+
+    /**
+     * Returns true if the readability of the provided `text` written in `lang` is in `readabilities`
+     *
+     * @param {string} text
+     * @param {string} lang
+     * @param {array} readabilities
+     */
+    readabilityIs (text, lang = 'en', readabilities = []) {
+        return this.readabilityCategory(text, lang)
+            .then(readability => readabilities.includes(readability))
+    }
+
+    /**
+     * Returns true if the given `text` written in `lang` is considered as readable
+     *
+     * @param {string} text
+     * @param {string} lang
+     */
+    isReadable (text, lang = 'en') {
+        return this.readabilityIs(text, lang, [
+            Readability.VeryEasy,
+            Readability.Easy,
+            Readability.FairlyEasy,
+            Readability.Standard
+        ])
+    }
+
+    /**
+     * Returns true if the given `text` written in `lang` is considered as not readable
+     *
+     * @param {string} text
+     * @param {string} lang
+     */
+    isNotReadable (text, lang = 'en') {
+        return this.readabilityIs(text, lang, [
+            Readability.VeryDifficult,
+            Readability.Difficult,
+            Readability.FairlyDifficult
+        ])
     }
 
     _normalizeText (text) {
@@ -435,5 +538,6 @@ class SilverDiamond {
 module.exports = {
     Api: SilverDiamond,
     Language: Language,
-    Sentiment: Sentiment
+    Sentiment: Sentiment,
+    Readability: Readability
 }
