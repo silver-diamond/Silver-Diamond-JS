@@ -1,6 +1,6 @@
 {
   "name": "silverdiamond",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JS wrapper for Silver Diamond Artificial Intelligence service",
   "main": "index.js",
   "dependencies": {
