@@ -521,6 +521,31 @@ class SilverDiamond {
         ])
     }
 
+    /**
+     * Generates an alt description for the given `imageUrl` written in `lang`
+     *
+     * @param {string} imageUrl
+     * @param {string} lang
+     */
+    describeImage (imageUrl, lang = 'en') {
+        const data = {
+            image_url: imageUrl,
+            lang: lang
+        }
+
+        return new Promise((resolve, reject) => {
+            this.client.request('image-alt-detection', data)
+                .then(response => {
+                    if (!response.hasOwnProperty('alt') || !response.hasOwnProperty('confidence')) {
+                        return reject(new Error('Unknown error'))
+                    }
+
+                    resolve(response)
+                })
+                .catch(reject)
+        })
+    }
+
     _normalizeText (text) {
         if (typeof text !== 'string') {
             throw new Error('Text must be a string')
