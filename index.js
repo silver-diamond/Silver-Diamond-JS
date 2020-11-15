@@ -546,6 +546,34 @@ class SilverDiamond {
         })
     }
 
+    /**
+     * Returns the BERT Score for a given URL and Keyword.
+     * 
+     * BERT Score represents, from 0 to 100, how well the content of your URL
+     * answers the user's search intent.
+     *
+     * @param {string} url
+     * @param {string} keyword
+     */
+    bertScore (url, keyword) {
+        const data = {
+            url: url,
+            keyword: keyword
+        }
+
+        return new Promise((resolve, reject) => {
+            this.client.request('bert-score', data)
+                .then(response => {
+                    if (!response.hasOwnProperty('bert_score')) {
+                        return reject(new Error('Unknown error'))
+                    }
+
+                    resolve(response['bert_score'])
+                })
+                .catch(reject)
+        })
+    }
+
     _normalizeText (text) {
         if (typeof text !== 'string') {
             throw new Error('Text must be a string')
