@@ -574,6 +574,29 @@ class SilverDiamond {
         })
     }
 
+    /**
+     * Returns the detected objects inside $imageUrl
+     *
+     * @param {string} imageUrl
+     */
+    recognizeObjects (imageUrl) {
+        const data = {
+            image_url: imageUrl
+        }
+
+        return new Promise((resolve, reject) => {
+            this.client.request('image-object-recognition', data)
+                .then(response => {
+                    if (!response.hasOwnProperty('objects')) {
+                        return reject(new Error('Unknown error'))
+                    }
+
+                    resolve(response['objects'])
+                })
+                .catch(reject)
+        })
+    }
+
     _normalizeText (text) {
         if (typeof text !== 'string') {
             throw new Error('Text must be a string')
