@@ -597,6 +597,49 @@ class SilverDiamond {
         })
     }
 
+    /**
+     * Runs a nudity detection analysis
+     *
+     * @param {string} imageUrl
+     */
+    nudityDetection (imageUrl) {
+        const data = {
+            image_url: imageUrl
+        }
+
+        return new Promise((resolve, reject) => {
+            this.client.request('nudity-detection', data)
+                .then(response => {
+                    if (!response.hasOwnProperty('has_nudity')) {
+                        return reject(new Error('Unknown error'))
+                    }
+
+                    resolve(response)
+                })
+                .catch(reject)
+        })
+    }
+
+    /**
+     * Checks if the given image contains nudity.
+     *
+     * @param {string} imageUrl
+     */
+    hasNudity (imageUrl) {
+        return this.nudityDetection(imageUrl)
+            .then(response => response.has_nudity)
+    }
+
+    /**
+     * Returns the probability of the given image containing nudity.
+     *
+     * @param {string} imageUrl
+     */
+    nudityProbability (imageUrl) {
+        return this.nudityDetection(imageUrl)
+            .then(response => response.probability)
+    }
+
     _normalizeText (text) {
         if (typeof text !== 'string') {
             throw new Error('Text must be a string')
